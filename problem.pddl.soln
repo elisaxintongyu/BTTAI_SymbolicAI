@@ -1,0 +1,3 @@
+(move monkey1 posd posc)
+(move monkey1 posc posb)
+(grab_banana_from_box monkey1 banana1 boxb posb)
