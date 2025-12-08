@@ -1,106 +1,179 @@
-// app/page.jsx
-export default function Page() {
+"use client";
+
+import { useState, ChangeEvent } from "react";
+import bgImage from "./Screenshot 2025-12-07 at 10.01.10 PM.png";
+import detectedImg from "./vis_yolo.jpg"
+
+/* -------------------------------------------------------
+   TYPES
+-------------------------------------------------------- */
+
+interface ChatSectionProps {
+  sceneImage: string | null;
+  setSceneImage: (url: string | null) => void;
+}
+
+interface ModelPanelProps {
+  sceneImage: string | null;
+}
+
+/* -------------------------------------------------------
+   ROOT PAGE
+-------------------------------------------------------- */
+
+export default function Page(): JSX.Element {
+  const [sceneImage, setSceneImage] = useState<string | null>(null);
+
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* LEFT PANEL */}
       <div className="w-[40%] max-w-xl border-r border-gray-300 flex flex-col bg-white">
-        <ChatSection />
-        <SceneList />
+        <ChatSection sceneImage={sceneImage} setSceneImage={setSceneImage} />
       </div>
 
       {/* RIGHT PANEL */}
       <div className="flex-1 p-8 overflow-y-auto bg-gray-50">
-        <ModelPanel />
+        <ModelPanel sceneImage={sceneImage} />
       </div>
     </div>
   );
 }
 
-/* ---------- LEFT: CHAT ---------- */
+/* -------------------------------------------------------
+   CHAT + IMAGE UPLOAD
+-------------------------------------------------------- */
 
-function ChatSection() {
+function ChatSection({
+  sceneImage,
+  setSceneImage,
+}: ChatSectionProps): JSX.Element {
+  const [text, setText] = useState<string>("");
+  const uploadImage = async (file: File): Promise<void> => {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = (await res.json()) as { fileUrl?: string; error?: string };
+
+    if (res.ok && data.fileUrl) {
+      setSceneImage(data.fileUrl);
+    } else {
+      alert("Upload failed: " + (data.error ?? "Unknown error"));
+    }
+  };
+
+  const handleUploadClick = (): void => {
+    const input = document.getElementById("imageUploadInput") as HTMLInputElement | null;
+    input?.click();
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const file = e.target.files?.[0];
+    if (file) uploadImage(file);
+  };
+
+  const handleMessaging = async (): Promise<void> => {
+    if (!sceneImage) {
+      alert("Please upload an image first.");
+      return;
+    }
+    const question = text.trim();
+    if (!question) {
+      alert("Please enter a question.");
+      return;
+    }
+
+    const res = await fetch("/api/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageUrl: sceneImage, question }),
+    });
+    const data = await res.json();
+    //TODO: handle response
+    // data.objects, data.fol, data.plan, data.answer
+
+  };
+
   return (
     <div className="flex-1 p-6 flex flex-col justify-between">
+      {/* Image block */}
+        <div>
+          <h2 className="text-sm font-semibold text-gray-600 mb-2">Image</h2>
+
+          {sceneImage ? (
+            <img
+              src={sceneImage}
+              className="w-full rounded-md object-cover h-[50vh]"
+              alt="Uploaded Scene"
+            />
+          ) : (
+            <div className="w-full min-h-[40vh] rounded-md bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+              Scene image
+            </div>
+          )}
+        </div>
       {/* Chat history */}
       <div>
-        {/* Scene image placeholder */}
-        <div className="mb-4">
-          <div className="w-full h-40 rounded-md bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-            Scene image
-          </div>
-        </div>
-
-        {/* User message */}
         <div className="bg-[#5b4b7a] text-white px-4 py-3 rounded-2xl rounded-bl-sm w-fit mb-3 max-w-[90%]">
-          Can the monkey get the bananas on the shelf?
+          Welcome to Neural Symbolic Monkeys! Please start with uploading an image of a scene.
         </div>
 
-        {/* Model reply */}
-        <div className="bg-gray-200 text-gray-900 px-4 py-3 rounded-2xl rounded-br-sm w-fit max-w-[90%]">
-          It can if it stacks box A on B on C, and then climbs the stack.
+        <div className="bg-gray-200 text-gray-900 px-4 py-3 rounded-2xl rounded-br-sm w-fit mb-3 max-w-[90%] justify-self-end">
+          How does the monkey get the banana?
+        </div>
+
+        <div className="bg-[#5b4b7a] text-white px-4 py-3 rounded-2xl rounded-bl-sm w-fit mb-3 max-w-[90%]">
+          It can climb on top of box B and move right to reach the banana.
         </div>
       </div>
 
       {/* Input area */}
       <div className="mt-4 flex items-center gap-3">
-        {/* Plus button */}
-        <button className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-lg">
-          +
+        <input
+          id="imageUploadInput"
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+
+        {/* Plus upload button */}
+        <button
+          onClick={handleUploadClick}
+          className="w-full py-3 rounded-lg text-black bg-gray-200 flex items-center justify-center text-lg font-medium hover:bg-gray-300 transition"
+        >
+          + Upload Image
         </button>
 
-        {/* Input */}
-        <div className="flex-1 flex items-center bg-[#efe8f5] rounded-full px-4 py-2 border border-gray-300">
+        <div className="flex-1 flex items-center text-black bg-[#efe8f5] rounded-full px-4 py-2 border border-gray-300">
           <input
             className="flex-1 bg-transparent border-none outline-none text-sm"
-            placeholder="Message Neural Symbolic Monkeys"
+            placeholder="Message Neural Symbolic Monkeys..."
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)} 
           />
-          {/* Search icon (simple text/emoji to avoid extra deps) */}
-          <span className="text-lg mr-2">🔍</span>
-          {/* Mic icon */}
-          <span className="text-lg">🎤</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ---------- LEFT: SCENE LIST ---------- */
-
-function SceneList() {
-  const scenes = ["Scene…", "Scene…", "Scene", "Scene", "Scene"];
-
-  return (
-    <div className="border-t border-gray-200 px-4 py-3">
-      {/* View toggle icons placeholder */}
-      <div className="flex justify-end mb-3 gap-2 text-gray-500 text-sm">
-        <div className="w-7 h-7 flex items-center justify-center rounded-md bg-gray-200">
-          ≡
-        </div>
-        <div className="w-7 h-7 flex items-center justify-center rounded-md">
-          ☐
-        </div>
-      </div>
-
-      <div className="space-y-2">
-        {scenes.map((label, i) => (
           <button
-            key={i}
-            className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm ${
-              i === 0 ? "bg-[#e6deef]" : "bg-transparent hover:bg-gray-100"
-            }`}
+            onClick={handleMessaging}
+            className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
           >
-            <span className="w-3 h-3 rounded-full bg-gray-300 inline-block" />
-            <span className="text-gray-800">{label}</span>
+            Send
           </button>
-        ))}
+        </div>
       </div>
     </div>
   );
 }
 
-/* ---------- RIGHT: MODEL PANEL ---------- */
+/* -------------------------------------------------------
+   RIGHT: MODEL PANEL
+-------------------------------------------------------- */
 
-function ModelPanel() {
+function ModelPanel({ sceneImage }: ModelPanelProps): JSX.Element {
   return (
     <div className="max-w-4xl mx-auto">
       <header className="mb-8">
@@ -111,45 +184,45 @@ function ModelPanel() {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-        {/* Image block */}
         <div>
-          <h2 className="text-sm font-semibold text-gray-600 mb-2">Image</h2>
-          <div className="w-full aspect-[16/9] rounded-md bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-            Scene image
-          </div>
+          <h2 className="text-sm font-semibold text-gray-600 mb-2">
+            Detection with bounded boxes 
+          </h2>
+          <img src={detectedImg.src} alt="Detected Scene" />
         </div>
 
         {/* Object detection grid */}
         <div>
           <h2 className="text-sm font-semibold text-gray-600 mb-2">
-            Object Detection
+            Detection with array representation
           </h2>
-          <ObjectGrid />
+          <img src={bgImage.src} alt="Object Detection Grid" />
         </div>
       </div>
 
-      {/* Directions block */}
       <div className="mt-10">
-        <h2 className="text-sm font-semibold text-gray-700 mb-2">
-          Directions
-        </h2>
+        <h2 className="text-sm font-semibold text-gray-700 mb-2">FOL Directions</h2>
         <div className="bg-gray-100 rounded-md px-4 py-3 text-sm font-mono text-gray-800 space-y-1">
-          <div>leftOf(monkey, boxA)</div>
-          <div>get(monkey, banana)</div>
+          <div>(move monkey l1 l2)</div>
+          <div>(climb_on monkey box1 l2)</div>
+          <div>(climb_off monkey box1 l2)</div>
+          <div>(move monkey l2 l3)</div>
+          <div>(grab_banana_from_ground monkey banana l3)</div>
         </div>
       </div>
     </div>
   );
 }
 
-/* ---------- OBJECT GRID ---------- */
+/* -------------------------------------------------------
+   OBJECT GRID
+-------------------------------------------------------- */
 
-function ObjectGrid() {
+function ObjectGrid(): JSX.Element {
   const rows = 10;
   const cols = 10;
 
-  // crude “heatmap” layout similar to the screenshot
-  const specialCells = {
+  const specialCells: Record<string, string> = {
     "1,7": "bg-amber-800",
     "4,6": "bg-amber-500",
     "4,5": "bg-yellow-400",
@@ -160,21 +233,25 @@ function ObjectGrid() {
     "8,6": "bg-gray-700",
   };
 
+  const grid = [];
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const key = `${col},${row}`;
+      const color = specialCells[key] ?? "bg-black/10";
+
+      grid.push(
+        <div
+          key={key}
+          className={`w-5 h-5 md:w-6 md:h-6 border border-black/40 ${color}`}
+        />
+      );
+    }
+  }
+
   return (
     <div className="inline-grid grid-cols-10 gap-[1px] bg-black/40 p-[2px]">
-      {Array.from({ length: rows }).map((_, row) =>
-        Array.from({ length: cols }).map((_, col) => {
-          const key = `${col},${row}`;
-          const color = specialCells[key] || "bg-black/10";
-
-          return (
-            <div
-              key={key}
-              className={`w-5 h-5 md:w-6 md:h-6 border border-black/40 ${color}`}
-            />
-          );
-        })
-      )}
+      {grid}
     </div>
   );
 }
