@@ -1,54 +1,116 @@
-#Integrating Deep Learning Models With Symbolic Approaches to AI
-
-⚠️ _Update the above title with your AI Studio Challenge Project name. Remove all guidance notes and examples in this template before finalizing your README._
+# Integrating Deep Learning Models With Symbolic Approaches to AI
 
 ---
 
 ### 👥 **Team Members**
 
-**Example:**
-
-| Name             | GitHub Handle | Contribution                                                             |
-
-|------------------|---------------|--------------------------------------------------------------------------|
-
-| Era Kalaja    | @csera5  | Computer Vision object detection, Data Exploration, Integration   |
-
-| Michelle Zuckerberg   | @X     | X  | Planner component, and instructions on how to use it for integration with the LLM component; Organizing team meetings
-
-| X     | @X  | X                 |
-
-| X      | @X       | X  |
-
-| X       | @X    | X           |
+| Name                | GitHub Handle | Contribution                                                                           |
+| ------------------- | ------------- | -------------------------------------------------------------------------------------- |
+| Era Kalaja          | @csera5       | Computer Vision object detection, Data Exploration, Integration                        |
+| Michelle Zuckerberg | @mlzuckerberg | STRIPS planner component development, integration documentation, and team coordination |
+|                     |               |                                                                                        |
+|                     |               |                                                                                        |
+|                     |               |                                                                                        |
+|                     |               |                                                                                        |
 
 ---
 
 ## 🎯 **Project Highlights**
 
 - Developed an integrated neural-symbolic AI system combining computer vision, large language models, and a STRIPS planner to address the challenge of translating natural-language questions and visual scenes into executable, interpretable action plans.
-
 - Achieved reliable end-to-end system performance, including high-accuracy object detection, consistent symbolic fact generation, accurate goal translation, and valid action sequences, demonstrating the value of a multi-component pipeline for interpretable reasoning within MIT Lincoln Laboratory's research context.
-
 - Generated actionable insights across the full pipeline, transforming raw images into symbolic propositions, natural language into formal logic, and planner outputs into human-readable explanations, enabling users and stakeholders to understand why and how the system reached its conclusions.
-
-- Implemented a hybrid methodology integrating YOLOv8-based perception, LangChain-powered goal extraction, and Pyperplan STRIPS planning, satisfying industry expectations for explainable AI by ensuring each module produced traceable, verifiable intermediate outputs.
+- Implemented a hybrid methodology integrating YOLOv8-based perception, OpenAI-powered goal extraction, and Pyperplan STRIPS planning, satisfying industry expectations for explainable AI by ensuring each module produced traceable, verifiable intermediate outputs.
 
 ---
 
 ## 👩🏽‍💻 **Setup and Installation**
 
-**Provide step-by-step instructions so someone else can run your code and reproduce your results. Depending on your setup, include:**
+### **Prerequisites**
 
-* How to clone the repository
+- Python 3.7 or higher
+- pip (Python package installer)
+- OpenAI API key (for LLM component)
 
-* How to install dependencies
+### **1. Clone the Repository**
 
-* How to set up the environment
+```bash
+git clone https://github.com/elisaxintongyu/BTTAI_SymbolicAI.git
+cd BTTAI_SymbolicAI
+```
 
-* How to access the dataset(s)
+### **2. Install Dependencies**
 
-* How to run the notebook or scripts
+Install all required Python packages:
+
+```bash
+pip install -r requirements.txt
+```
+
+Key dependencies include:
+
+- `ultralytics` (YOLOv8 for computer vision)
+- `pyperplan` (STRIPS planner)
+- `openai` (LLM integration)
+- `torch` and `torchvision` (deep learning frameworks)
+- `opencv-python` (image processing)
+- `onnxruntime` (model inference)
+
+### **3. Set Up Environment Variables**
+
+Create a `.env` file in the project root directory:
+
+```bash
+touch .env
+```
+
+Add your OpenAI API key to the `.env` file:
+
+```
+OPENAI_API_KEY=your_api_key_here
+```
+
+**Note:** The LLM component requires a valid OpenAI API key. You can obtain one from [OpenAI&#39;s website](https://platform.openai.com/api-keys).
+
+### **4. Access the Dataset**
+
+The dataset is included in the repository under `data/monkey_dataset/`:
+
+- Training images: `data/monkey_dataset/train/`
+- Validation images: `data/monkey_dataset/valid/`
+- Test images: `data/monkey_dataset/test/`
+
+Each split contains both `images/` and `labels/` directories with YOLO-format annotations.
+
+### **5. Run the System**
+
+**Basic Usage:**
+
+Run the complete neural-symbolic pipeline:
+
+```bash
+python main.py -i <image_path> -q "<question>"
+```
+
+**Examples:**
+
+```bash
+# Process a realistic image
+python main.py -i data/monkey_dataset/test/images/canvas_0_banana3_monkey1_box3_png.rf.b415fe8a11da2ac54f21f1907ed2fb59.jpg -q "How can the monkey get the banana?"
+
+# Use grid mode (no model required)
+python main.py -i planner/example_image.png -q "Get the banana" --mode grid
+
+# Enable verbose logging
+python main.py -i <image_path> -q "<question>" --verbose
+```
+
+**Command-line Arguments:**
+
+- `-i, --image`: Path to input image (required)
+- `-q, --question`: Natural language question about the planning problem (required)
+- `-m, --mode`: Image processing mode - `realistic` or `grid` (default: `realistic`)
+- `-v, --verbose`: Enable verbose logging
 
 ---
 
@@ -59,11 +121,8 @@ This project was created as part of the Break Through Tech AI Program, which pro
 Our project focused on building an end-to-end neural-symbolic reasoning system that can interpret an image of a scene, understand a natural-language question about it, and generate an interpretable sequence of actions to achieve a goal. To accomplish this, we developed:
 
 - A computer vision module using YOLOv8 to detect objects and convert them into symbolic propositions
-
 - An LLM component that translates user questions into formal logic goals and explains planner output
-
 - A STRIPS planning module (Pyperplan) that computes valid action sequences using symbolic rules
-
 - A custom frontend and integration layer that connects all components into an interactive user experience
 
 This work addresses a broader real-world challenge: creating AI systems that are both capable and explainable. Neural-symbolic systems offer a path toward AI that can perceive complex environments, reason over them, and clearly communicate its decision process. The potential applications span robotics, autonomous agents, decision support, and any domain where transparent, verifiable reasoning is essential.
@@ -74,108 +133,200 @@ Our project demonstrates a practical example of how perception, language underst
 
 ## 📊 **Data Exploration**
 
-Dataset Description
+### **Dataset Description**
 
-Our project used two custom-curated datasets designed to support both perception and symbolic reasoning components of the system: (1) Realistic Image Dataset: Contained images representing monkeys, bananas, and boxes in a room-like environment. These images were manually annotated using Roboflow, producing YOLO-format bounding boxes. (2) Abstract Grid Dataset - A semantically equivalent dataset where objects were represented as colored cells on a grid. This allowed controlled experiments on scene understanding without visual noise or variation. Both datasets supported multi-class object detection, enabling us to identify the monkey, banana, and multiple box types required for downstream symbolic reasoning.
+Our project used two custom-curated datasets designed to support both perception and symbolic reasoning components of the system:
 
-Format, Size & Structure
+1. **Realistic Image Dataset**: Contained images representing monkeys, bananas, and boxes in a room-like environment. These images were manually annotated using Roboflow, producing YOLO-format bounding boxes.
+2. **Abstract Grid Dataset**: A semantically equivalent dataset where objects were represented as colored cells on a grid. This allowed controlled experiments on scene understanding without visual noise or variation.
 
-Annotation Format: YOLOv8 annotations (class, x_center, y_center, width, height)
+Both datasets supported multi-class object detection, enabling us to identify the monkey, banana, and multiple box types required for downstream symbolic reasoning.
 
-Data Types: Raster images + bounding box labels
+### **Format, Size & Structure**
 
-Classes: Monkey, Banana, Box A-E, Background
+- **Annotation Format**: YOLOv8 annotations (class, x_center, y_center, width, height)
+- **Data Types**: Raster images + bounding box labels
+- **Classes**: Monkey, Banana, Box A-E, Background
+- **Purpose**: Provide object-level spatial information to be converted into symbolic propositions for planning
 
-Purpose: Provide object-level spatial information to be converted into symbolic propositions for planning
+### **Preprocessing**
 
-Preprocessing 
+- Image preprocessing: resizing, normalization, and batch preparation
+- Train/val/test splits: ensuring generalizable performance across both datasets
 
-Image preprocessing: resizing, normalization, and batch preparation
+### **Challenges & Assumptions**
 
-Train/val/test splits: ensuring generalizable performance across both datasets
-
-Challenges & Assumptions
-
-Small dataset size: required careful annotation and data augmentation to avoid overfitting.
-
-Sample Dataset Image:
+- Small dataset size: required careful annotation and data augmentation to avoid overfitting.
 
 ---
 
 ## 🧠 **Model Development**
 
-**You might consider describing the following (as applicable):**
+### **Models Used**
 
-* Model(s) used (e.g., CNN with transfer learning, regression models)
+- Our computer vision component is built on YOLOv8n, a lightweight, high-speed object detection model well-suited for real-time detection and small custom datasets. YOLOv8 served as both a feature extractor, learning spatial patterns through convolutional layers and a detection head, predicting bounding boxes, object classes, and confidence scores. This model was selected for its strong performance on small datasets and its ability to reliably detect multiple objects required by the symbolic planner (monkey, banana, boxes A–E).
 
-* Feature selection and Hyperparameter tuning strategies
+### **Features & Hyperparameter Strategy**
 
-* Training setup (e.g., % of data for training/validation, evaluation metric, baseline performance)
+- Since YOLOv8 extracts hierarchical spatial features automatically, manual feature selection was not required. Instead, the focus was on optimizing training behavior through: Learning rate tuning via YOLO's built-in scheduler, batch size adjustments to prevent overfitting on a small dataset, and data augmentation (horizontal flips, brightness/contrast shifts) to improve generalization.
 
-Models Used:
+### **Training Setup**
 
-- Our computer vision component is built on YOLOv8n, a lightweight, high-speed object detection model well-suited for real-time detection and small custom datasets. YOLOv8 served as both a feature extractor, learning spatial patterns through convolutional layers and a detection head, predicting bounding boxes, object classes, and confidence scores. This model was selected for its strong performance on small datasets and its ability to reliably detect multiple objects required by the symbolic planner (monkey, banana, boxes A–E). 
+- The Computer Vision model had a train/validation/test split of 70/20/10. It was evaluated on box_loss, precision, and recall.
 
-Features & Hyperparameter Strategy
+---
 
-- Since YOLOv8 extracts hierarchical spatial features automatically, manual feature selection was not required. Instead, the focus was on optimizing training behavior through: Learning rate tuning via YOLO's built-in scheduler, batch size adjustments to prevent overfitting on a small dataset, and data augmentation (horizontal flips, brightness/contrast shifts) to improve generalization. 
+## 🧩 **STRIPS Planner Component**
 
-Training Setup:
+### **Overview**
 
-- The Computer Vision model had a train/validation/test split of 70/20/10. It was evaluated on box_loss, precision, and recall. 
+The STRIPS (Stanford Research Institute Problem Solver) planner is a symbolic reasoning module that generates executable action sequences to achieve goals specified in formal logic. This component bridges the gap between the neural perception layer (computer vision) and the natural language interface (LLM), translating symbolic world states into interpretable action plans.
+
+### **Implementation**
+
+**Pyperplan Integration:**
+
+- **Tool**: [Pyperplan](https://github.com/aibasel/pyperplan) - A lightweight, Python-based STRIPS planner
+- **Input Format**: PDDL (Planning Domain Definition Language) files
+  - `domain.pddl` - Defines the planning domain with predicates and actions
+  - `problem.pddl` - Defines initial state, objects, and goal for specific scenarios
+- **Output**: Action sequence plan (`.soln` file) containing ordered steps to achieve the goal
+
+### **Planning Domain: Monkey and Banana World**
+
+**Predicates (World State Representation):**
+
+- **Location Predicates**: `(at ?monkey ?location)`, `(box-at ?box ?location)`, `(banana-at ?banana ?location)`
+- **Height/Level Predicates**: `(on-ground ?monkey)`, `(on-box ?monkey ?box)`, `(box-on-ground ?box)`, `(banana-on-ground ?banana)`, `(banana-on-box ?banana ?box)`
+- **Movement Predicates**: `(adjacent ?loc1 ?loc2)` - Defines which locations are connected
+- **Goal Predicate**: `(has-banana ?monkey ?banana)` - Represents successful goal achievement
+
+**Actions (Available Operations):**
+
+1. **`move(?monkey ?from ?to)`** - Monkey moves between adjacent locations (must be on ground)
+2. **`climb_on(?monkey ?box ?location)`** - Monkey climbs onto a box at the same location
+3. **`climb_off(?monkey ?box ?location)`** - Monkey climbs off a box back to ground
+4. **`push_box(?monkey ?box ?from ?to)`** - Monkey pushes a box to an adjacent location (must be on ground)
+5. **`grab_banana_from_ground(?monkey ?banana ?location)`** - Monkey grabs a banana from the ground
+6. **`grab_banana_from_box(?monkey ?banana ?box ?location)`** - Monkey grabs a banana from on top of a box
+
+### **Search Algorithms**
+
+The planner supports multiple search strategies:
+
+- **Breadth-First Search (BFS)** - Default algorithm, guarantees shortest solution path
+- **Greedy Best-First Search (GBF)** - Uses heuristics (e.g., FF heuristic) to explore promising paths first, faster for complex problems
+- **A\* Search** - Combines path cost and heuristic estimates for optimal solutions with better efficiency than pure BFS
+
+### **Integration with System Pipeline**
+
+1. **Input**: Receives symbolic initial state from vision module (object positions, relationships) and goal from LLM component (translated from natural language)
+2. **Processing**: Converts state/goal dictionaries to PDDL problem format, runs pyperplan search algorithm
+3. **Output**: Returns ordered list of actions (e.g., `["move monkey1 posD posC", "move monkey1 posC posB", "grab_banana_from_box monkey1 banana1 boxB posB"]`)
+4. **Explanation**: Action sequence is passed to LLM component for natural language explanation
+
+### **Example Scenario**
+
+**Initial State:**
+
+- Monkey at position D
+- Box B at position B with banana on top
+- Box C at position C
+- Adjacency: A↔B↔C↔D
+
+**Goal:** `(has-banana monkey1 banana1)`
+
+**Generated Plan (3 steps):**
+
+1. `(move monkey1 posD posC)` - Move from D to C
+2. `(move monkey1 posC posB)` - Move from C to B
+3. `(grab_banana_from_box monkey1 banana1 boxB posB)` - Grab the banana from box B
+
+### **Usage**
+
+The planner component is integrated via the `STRIPSPlanner` class (aliased from `PyperplanPlanner`) in `planner.py`:
+
+```python
+from planner import STRIPSPlanner
+
+planner = STRIPSPlanner(domain_file="planner/domain.pddl")
+plan = planner.plan(
+    initial_state={"monkey_location": "posD", "banana_location": "posB", ...},
+    goal={"has_banana": True},
+    search_algorithm="bfs"
+)
+```
+
+### **Limitations**
+
+- **Single-level climbing only** - Monkey can climb onto one box, but not onto stacked boxes
+- **No box stacking** - Domain lacks `(box-on-box)` predicate, cannot represent vertically stacked boxes
+- **Discrete movement** - Monkey moves between adjacent positions without intermediate steps
+- **Fixed reach** - Monkey reach height is 3 units (can grab from ground or single box, but not from multiple stacked boxes)
+
+---
+
+## 🤖 **LLM Component**
+
+_This section is to be filled in by the LLM team._
 
 ---
 
 ## 📈 **Results & Key Findings**
 
-**You might consider describing the following (as applicable):**
-
-* Performance metrics (e.g., Accuracy, F1 score, RMSE)
-
-* How your model performed
-
-* Insights from evaluating model fairness
+### **Computer Vision Model**
 
 - Computer vision model metrics included: Recall, Precision, box_loss, mAP50. It performed very well across the dataset, with only some challenges distinguishing box E from box B. This challenge likely occurred since box B is seen in the training data over 80 times, while box E is only seen around 6 times so the model was biased towards box B. See below visualizations:
+
+### **STRIPS Planner Component**
+
+- **Success Rate**: The planner successfully generates valid action sequences for all solvable scenarios in the monkey-banana domain. It correctly handles various initial configurations including different monkey positions, box placements, and banana locations.
+- **Performance Metrics**:
+
+  - **Plan Generation Time**: Average search time of ~0.003 seconds for typical problems using breadth-first search
+  - **Plan Length**: Successfully finds optimal solutions (typically 3-5 steps for standard scenarios)
+  - **Search Algorithm Comparison**: BFS guarantees shortest paths, while greedy best-first search with FF heuristic provides faster solutions for more complex problems
+- **Integration Success**: The planner seamlessly integrates with the vision module (receiving symbolic state) and LLM component (receiving goals and outputting action sequences). The PDDL problem generation correctly converts dictionary-based state representations into valid PDDL format.
+- **Domain Coverage**: Successfully handles all defined actions (move, climb_on, climb_off, push_box, grab_banana_from_ground, grab_banana_from_box) and correctly enforces preconditions and effects for each action.
+- **Limitations Observed**: The planner correctly identifies unsolvable scenarios (e.g., when goals are impossible given initial state constraints) and returns appropriate error handling.
+
+### **LLM Component**
+
+_Results and key findings to be filled in by the LLM team._
 
 ---
 
 ## 🚀 **Next Steps**
 
-**You might consider addressing the following (as applicable):**
+### **STRIPS Planner**
 
-* What are some of the limitations of your model?
+- **Stacked boxes** - Would need to add a `(box-on-box)` predicate to represent vertically stacked boxes
+- **Box stacking actions** - Would need to add stacking actions for Monkey as well as climbing the stacks
+- **Multiple simultaneous goals** - Potentially get one banana first, then re-run to get second, and so on
 
-* What would you do differently with more time/resources?
+### **Computer Vision**
 
-* What additional datasets or techniques would you explore?
+- Generalize the CV model for more real world applications
+
+### **LLM**
+
+- Experiment with other models to find an optimal output
 
 ---
 
 ## 📝 **License**
 
-If applicable, indicate how your project can be used by others by specifying and linking to an open source license type (e.g., MIT, Apache 2.0). Make sure your Challenge Advisor approves of the selected license type.
-
-**Example:**
-
 This project is licensed under the MIT License.
 
 ---
 
-## 📄 **References** (Optional but encouraged)
-
-Cite relevant papers, articles, or resources that supported your project.
-
----
-
-## 🙏 **Acknowledgements** (Optional but encouraged)
+## 🙏 **Acknowledgements**
 
 We would like to express our sincere gratitude to everyone who supported and guided us throughout this project.
 
 Our Challenge Advisors at MIT Lincoln Laboratory
 
 - Lee Martie, Technical Staff
-
 - Sandra Hawkins, Assistant Staff
 
 Our TA
