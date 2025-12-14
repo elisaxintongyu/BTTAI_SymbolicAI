@@ -1,299 +1,195 @@
-# Neural Symbolic Monkeys - Planner Component
+#Integrating Deep Learning Models With Symbolic Approaches to AI
 
-## Project Overview
+⚠️ _Update the above title with your AI Studio Challenge Project name. Remove all guidance notes and examples in this template before finalizing your README._
 
-This is a part of the team project for the AI Studio Challenge. The system combines:
+---
 
-- Computer Vision: Detects objects in images
-- LLM Agent: Converts visual data to symbolic propositions
-- STRIPS Planner: Generates action sequences to achieve goals
-- Response System: Executes the plan
+### 👥 **Team Members**
 
-In this overall project, we are interested in creating a neural-symbolic system that combines large language models, vision models, and a planner to answer planning questions. We create a project that is a spin on an old symbolic planning problem of finding the sequence of steps a monkey needs to do to get bananas in a room.
+**Example:**
 
-## What is the Planner?
+| Name             | GitHub Handle | Contribution                                                             |
 
-### **STRIPS Planning**
+|------------------|---------------|--------------------------------------------------------------------------|
 
-STRIPS (Stanford Research Institute Problem Solver) is a classical AI planning approach that:
+| Era Kalaja    | @csera5  | Computer Vision object detection, Data Exploration, Integration   |
 
-- Represents world states as sets of logical propositions (predicates)
-- Defines actions with preconditions (what must be true to execute) and effects (what changes)
-- Searches through possible action sequences to find a path from initial state to goal state
+| Michelle Zuckerberg   | @X     | X  | Planner component, and instructions on how to use it for integration with the LLM component; Organizing team meetings
 
-### **Pyperplan**
+| X     | @X  | X                 |
 
-[Pyperplan](https://github.com/aibasel/pyperplan) is a lightweight STRIPS planner written in Python. It:
+| X      | @X       | X  |
 
-- **Input**: Takes PDDL (Planning Domain Definition Language) files:
-  - `domain.pddl` - Defines the "rules of the world" (predicates and actions)
-  - `problem.pddl` - Defines a specific scenario (initial state, objects, goal)
-- **Process**: Uses search algorithms to find valid action sequences (see Search Algorithms section below)
-- **Output**: Generates a `.soln` file containing the sequence of actions to achieve the goal
+| X       | @X    | X           |
 
-### **Search Algorithms**
+---
 
-The planner explores a tree of possibilities where each node is a world state and each branch is an action.
+## 🎯 **Project Highlights**
 
-**1. Breadth-First Search (BFS)**
+- Developed an integrated neural-symbolic AI system combining computer vision, large language models, and a STRIPS planner to address the challenge of translating natural-language questions and visual scenes into executable, interpretable action plans.
 
-Strategy: Explore ALL possibilities at distance 1, then ALL at distance 2, then ALL at distance 3, etc.
+- Achieved reliable end-to-end system performance, including high-accuracy object detection, consistent symbolic fact generation, accurate goal translation, and valid action sequences, demonstrating the value of a multi-component pipeline for interpretable reasoning within MIT Lincoln Laboratory's research context.
 
-Example with your monkey problem:
-```
-Level 0: [Initial state: Monkey at D]
-         ↓
-Level 1: Try all possible actions from start
-         - Move D→C
-         - (other actions that don't apply)
-         ↓
-Level 2: From EACH Level-1 state, try all actions
-         - From "Monkey at C": Move C→D, Move C→B, etc.
-         ↓
-Level 3: From EACH Level-2 state, try all actions
-         - Eventually finds: Move D→C, then C→B, then grab_banana ✓
-```
+- Generated actionable insights across the full pipeline, transforming raw images into symbolic propositions, natural language into formal logic, and planner outputs into human-readable explanations, enabling users and stakeholders to understand why and how the system reached its conclusions.
 
-- **Pros**: Guaranteed to find the **shortest** solution, systematic
-- **Cons**: Explores EVERYTHING (even obviously bad paths), slow for large problems
+- Implemented a hybrid methodology integrating YOLOv8-based perception, LangChain-powered goal extraction, and Pyperplan STRIPS planning, satisfying industry expectations for explainable AI by ensuring each module produced traceable, verifiable intermediate outputs.
 
-**2. Greedy Best-First Search (with FF Heuristic)**
+---
 
-Strategy: Use a "smart guess" (heuristic) to explore promising paths first.
+## 👩🏽‍💻 **Setup and Installation**
 
-The **FF Heuristic** (Fast Forward) estimates: *"How many more actions do I probably need to reach the goal?"*
+**Provide step-by-step instructions so someone else can run your code and reproduce your results. Depending on your setup, include:**
 
-Example:
-```
-Initial state: Monkey at D, Banana at B
-FF heuristic says: "You're ~3 steps away"
+* How to clone the repository
 
-Next, try these actions:
-- Move D→C: FF says "now ~2 steps away" ← Looks promising! Explore this first
-- Push box: FF says "still ~3 steps away" ← Doesn't help, explore later
+* How to install dependencies
 
-After Move D→C:
-- Move C→B: FF says "now ~1 step away" ← Great! Explore this
-- Move C→D: FF says "now ~4 steps away" ← Going backwards, skip for now
+* How to set up the environment
 
-After Move C→B:
-- Grab banana: FF says "0 steps away - GOAL!" ✓
-```
+* How to access the dataset(s)
 
-- **Pros**: Much faster than BFS for complex problems, focuses on promising paths
-- **Cons**: NOT guaranteed to find the shortest path, heuristic might be misleading
+* How to run the notebook or scripts
 
-**3. A\* Search**
+---
 
-Strategy: Combines both approaches - considers:
-- **g(n)**: How many steps have I already taken? (like BFS)
-- **h(n)**: How many more steps will I probably need? (like Greedy, uses heuristic)
-- **f(n) = g(n) + h(n)**: Total estimated cost
+## 🏗️ **Project Overview**
 
-Always explores the node with lowest **f(n)** first.
+This project was created as part of the Break Through Tech AI Program, which provides students with industry experience in building real-world AI systems. Through the program's AI Studio, our team partnered with MIT Lincoln Laboratory to explore neural-symbolic AI: the combination of neural network perception with symbolic reasoning.
 
-Example:
-```
-State A: Took 2 steps, estimate 1 more → f = 3
-State B: Took 1 step, estimate 3 more → f = 4
+Our project focused on building an end-to-end neural-symbolic reasoning system that can interpret an image of a scene, understand a natural-language question about it, and generate an interpretable sequence of actions to achieve a goal. To accomplish this, we developed:
 
-A* explores State A first (lower total cost)
-```
+- A computer vision module using YOLOv8 to detect objects and convert them into symbolic propositions
 
-- **Pros**: **Optimal** - guaranteed to find shortest path (if heuristic is "admissible"), more efficient than pure BFS
-- **Cons**: More complex, still slower than pure Greedy for very large problems
+- An LLM component that translates user questions into formal logic goals and explains planner output
 
-**Algorithm Selection:**
+- A STRIPS planning module (Pyperplan) that computes valid action sequences using symbolic rules
 
-By default, Pyperplan uses **BFS**. For this simple monkey-banana problem, all three algorithms find the same 3-step solution quickly. For complex problems with many objects and locations, Greedy or A\* would be significantly faster.
+- A custom frontend and integration layer that connects all components into an interactive user experience
 
-You can specify the search algorithm with:
-```bash
-pyperplan -s <search_algorithm> domain.pddl problem.pddl
-# Options: bfs, astar, gbf (greedy best-first), etc.
-```
+This work addresses a broader real-world challenge: creating AI systems that are both capable and explainable. Neural-symbolic systems offer a path toward AI that can perceive complex environments, reason over them, and clearly communicate its decision process. The potential applications span robotics, autonomous agents, decision support, and any domain where transparent, verifiable reasoning is essential.
 
-### **How it Works in This System**
+Our project demonstrates a practical example of how perception, language understanding, and symbolic planning can work together, moving toward more trustworthy, interpretable, and adaptable AI systems.
 
-1. **Vision Model** detects objects in an image (boxes, bananas, monkey positions)
-2. **LLM Agent** converts visual data into PDDL propositions:
-   - `(at monkey1 posD)`
-   - `(banana-on-box banana1 boxB)`
-   - etc.
-3. **Pyperplan** (this component) finds the action sequence:
-   - Reads the domain rules
-   - Searches for a valid plan
-   - Returns steps like: `(move ...)`, `(grab_banana_from_box ...)`
-4. **Response System** executes or communicates the plan
+---
 
-## Setup Instructions
+## 📊 **Data Exploration**
 
-### **Prerequisites**
+Dataset Description
 
-- Python 3.7 or higher
-- pip (Python package installer)
+Our project used two custom-curated datasets designed to support both perception and symbolic reasoning components of the system: (1) Realistic Image Dataset: Contained images representing monkeys, bananas, and boxes in a room-like environment. These images were manually annotated using Roboflow, producing YOLO-format bounding boxes. (2) Abstract Grid Dataset - A semantically equivalent dataset where objects were represented as colored cells on a grid. This allowed controlled experiments on scene understanding without visual noise or variation. Both datasets supported multi-class object detection, enabling us to identify the monkey, banana, and multiple box types required for downstream symbolic reasoning.
 
-### **Installation**
+Format, Size & Structure
 
-1. **Install Pyperplan:**
+Annotation Format: YOLOv8 annotations (class, x_center, y_center, width, height)
 
-   ```bash
-   pip install pyperplan
-   ```
-2. **Verify Installation:**
+Data Types: Raster images + bounding box labels
 
-   ```bash
-   pyperplan --help
-   ```
-3. **Clone/Download Project Files:**
+Classes: Monkey, Banana, Box A-E, Background
 
-   - `domain.pddl` - Planning domain definition
-   - `problem.pddl` - Example problem file
-   - `README.md` - This documentation
+Purpose: Provide object-level spatial information to be converted into symbolic propositions for planning
 
-### **Quick Test**
+Preprocessing 
 
-```bash
-# Run the example problem
-pyperplan domain.pddl problem.pddl
+Image preprocessing: resizing, normalization, and batch preparation
 
-# View the solution
-cat problem.pddl.soln
-```
+Train/val/test splits: ensuring generalizable performance across both datasets
 
-### **Expected Output**
+Challenges & Assumptions
 
-```
-(move monkey1 posd posc)
-(move monkey1 posc posb)
-(grab_banana_from_box monkey1 banana1 boxb posb)
-```
+Small dataset size: required careful annotation and data augmentation to avoid overfitting.
 
-## Domain: Monkey and Banana World
+Sample Dataset Image:
 
-### **PDDL Domain and Problem Files**
+---
 
-The STRIPS planner component is now fully implemented using [Pyperplan](https://github.com/aibasel/pyperplan), a lightweight STRIPS planner written in Python.
+## 🧠 **Model Development**
 
-### **Files Created:**
+**You might consider describing the following (as applicable):**
 
-- `domain.pddl` - Defines the planning domain with predicates and actions
-- `problem.pddl` - Defines the initial state and goal for specific scenarios
-- `problem.pddl.soln` - Generated solution plan (auto-created by pyperplan)
+* Model(s) used (e.g., CNN with transfer learning, regression models)
 
-### **Propositions (World State):**
+* Feature selection and Hyperparameter tuning strategies
 
-**Location Predicates:**
+* Training setup (e.g., % of data for training/validation, evaluation metric, baseline performance)
 
-- `(at ?monkey ?location)` - Monkey is at a specific location
-- `(box-at ?box ?location)` - Box is at a specific location
-- `(banana-at ?banana ?location)` - Banana is at a specific location
+Models Used:
 
-**Height/Level Predicates:**
+- Our computer vision component is built on YOLOv8n, a lightweight, high-speed object detection model well-suited for real-time detection and small custom datasets. YOLOv8 served as both a feature extractor, learning spatial patterns through convolutional layers and a detection head, predicting bounding boxes, object classes, and confidence scores. This model was selected for its strong performance on small datasets and its ability to reliably detect multiple objects required by the symbolic planner (monkey, banana, boxes A–E). 
 
-- `(on-ground ?monkey)` - Monkey is on the ground
-- `(on-box ?monkey ?box)` - Monkey is on top of a box
-- `(box-on-ground ?box)` - Box is on the ground
-- `(banana-on-ground ?banana)` - Banana is on the ground
-- `(banana-on-box ?banana ?box)` - Banana is on top of a box
+Features & Hyperparameter Strategy
 
-**Movement Predicates:**
+- Since YOLOv8 extracts hierarchical spatial features automatically, manual feature selection was not required. Instead, the focus was on optimizing training behavior through: Learning rate tuning via YOLO's built-in scheduler, batch size adjustments to prevent overfitting on a small dataset, and data augmentation (horizontal flips, brightness/contrast shifts) to improve generalization. 
 
-- `(adjacent ?loc1 ?loc2)` - Two locations are adjacent (for movement)
+Training Setup:
 
-**Goal Predicate:**
+- The Computer Vision model had a train/validation/test split of 70/20/10. It was evaluated on box_loss, precision, and recall. 
 
-- `(has-banana ?monkey ?banana)` - Monkey has successfully grabbed the banana
+---
 
-### **Actions (What the monkey can do):**
+## 📈 **Results & Key Findings**
 
-1. **`move(?monkey ?from ?to)`** - Monkey moves between adjacent locations
+**You might consider describing the following (as applicable):**
 
-   - *Precondition:* Monkey at source location, locations are adjacent, monkey on ground
-   - *Effect:* Monkey moves to destination location
-2. **`climb_on(?monkey ?box ?location)`** - Monkey climbs onto a box
+* Performance metrics (e.g., Accuracy, F1 score, RMSE)
 
-   - *Precondition:* Monkey and box at same location, monkey on ground
-   - *Effect:* Monkey is now on the box
-3. **`climb_off(?monkey ?box ?location)`** - Monkey climbs off a box
+* How your model performed
 
-   - *Precondition:* Monkey on box, box at location
-   - *Effect:* Monkey is now on the ground
-4. **`push_box(?monkey ?box ?from ?to)`** - Monkey pushes a box to new location
+* Insights from evaluating model fairness
 
-   - *Precondition:* Monkey and box at source location, locations adjacent, monkey on ground
-   - *Effect:* Box moves to destination location
-5. **`grab_banana_from_ground(?monkey ?banana ?location)`** - Monkey grabs a banana from the ground
+- Computer vision model metrics included: Recall, Precision, box_loss, mAP50. It performed very well across the dataset, with only some challenges distinguishing box E from box B. This challenge likely occurred since box B is seen in the training data over 80 times, while box E is only seen around 6 times so the model was biased towards box B. See below visualizations:
 
-   - *Precondition:* Monkey and banana at same location, monkey on ground, banana on ground
-   - *Effect:* Monkey has the banana (goal achieved)
-6. **`grab_banana_from_box(?monkey ?banana ?box ?location)`** - Monkey grabs a banana from a box
+---
 
-   - *Precondition:* Monkey and banana at same location, monkey on ground, banana on box, box at location
-   - *Effect:* Monkey has the banana (goal achieved)
+## 🚀 **Next Steps**
 
-### **Example Scenario (Based on example_image.png):**
+**You might consider addressing the following (as applicable):**
 
-**Initial State:**
+* What are some of the limitations of your model?
 
-- Monkey at position D (rightmost)
-- Box D at position A (leftmost)
-- Box B at position B (middle) with banana on top
-- Box C at position C (rightmost)
-- Adjacency: A↔B↔C↔D
+* What would you do differently with more time/resources?
 
-**Goal:** `(has-banana monkey1 banana1)`
+* What additional datasets or techniques would you explore?
 
-**Generated Solution (3 steps):**
+---
 
-1. `(move monkey1 posd posc)` - Move from D to C
-2. `(move monkey1 posc posb)` - Move from C to B
-3. `(grab_banana_from_box monkey1 banana1 boxb posb)` - Grab the banana from box B
+## 📝 **License**
 
-### **Testing Results:**
+If applicable, indicate how your project can be used by others by specifying and linking to an open source license type (e.g., MIT, Apache 2.0). Make sure your Challenge Advisor approves of the selected license type.
 
-Successfully tested with Pyperplan using both breadth-first search and greedy best-first search with FF heuristic
-Planner correctly finds solutions for achievable goals
-Plan length: 3 steps for the example scenario
-Search time: ~0.003 seconds
+**Example:**
 
-### **Domain Limitations:**
+This project is licensed under the MIT License.
 
-**Current Implementation Constraints:**
+---
 
-- **Single-level climbing only** - Monkey can climb onto one box, but not onto boxes that are already stacked
-- **Discrete movement** - Monkey "teleports" between adjacent positions (no intermediate steps)
-- **Fixed heights** - Monkey (3 units), Boxes/Bananas (1 unit each)
-- **Ground-level pushing** - Monkey can only push boxes when on the ground
-- **No multi-banana goals** - Current goal predicate only handles one banana at a time
+## 📄 **References** (Optional but encouraged)
 
-**Scenarios NOT Supported:**
+Cite relevant papers, articles, or resources that supported your project.
 
-- **Stacked boxes** - The domain has NO `(box-on-box)` predicate, so it cannot represent boxes stacked on top of other boxes, either in the initial state or as a result of actions. If an input image contains stacked boxes, the system cannot accurately model that scenario.
-- **Multi-level climbing** - Monkey cannot climb from one box to another box
-- **Box stacking actions** - Monkey cannot stack boxes on top of each other (no `stack_box` action)
-- **Multiple simultaneous goals** - Cannot handle "get banana1 AND banana2" in one plan
+---
 
-**Height Constraint Examples:**
+## 🙏 **Acknowledgements** (Optional but encouraged)
 
-The domain enforces height checking through separate grab actions:
+We would like to express our sincere gratitude to everyone who supported and guided us throughout this project.
 
-- `grab_banana_from_ground` - for bananas on the ground (height 1)
-- `grab_banana_from_box` - for bananas on a single box (height 2)
+Our Challenge Advisors at MIT Lincoln Laboratory
 
-Both scenarios are reachable from ground level (monkey reach = 3 units):
+- Lee Martie, Technical Staff
 
-- **Reachable**: Banana on ground (height 1) or on single box (total height = 2)
-- **Unreachable (theoretical)**: Banana on 4 stacked boxes (total height = 5, exceeds monkey reach of 3)
+- Sandra Hawkins, Assistant Staff
 
-**Important:** The domain lacks a `(box-on-box)` predicate, so stacked boxes cannot be represented at all. If an input image shows boxes stacked vertically, the vision/LLM component would need to either:
+Our TA
 
-- Reinterpret stacked boxes as separate boxes at different horizontal positions
-- Reject the scenario as unsolvable within the current domain constraints
+- Mimi Lohanimit, EECS Graduate Researcher
 
-**To support stacked boxes, the domain would need:**
+Thank you for sharing your expertise, providing thoughtful technical direction, and helping us navigate the complexities of neural-symbolic AI.
 
-- New predicate: `(box-on-box ?box1 ?box2)` - to represent vertical stacking
-- New action: `stack_box(?monkey ?box1 ?box2 ?location)` - to stack boxes
-- Modified `climb_on` action - to allow climbing boxes that may be on other boxes
-- Height calculation logic - to track cumulative heights of stacked boxes
+Break Through Tech AI Program
+
+Thank you for creating this opportunity and supporting our growth as emerging AI practitioners through hands-on, real-world experience.
+
+AI Studio Teaching Assistants and Program Staff
+
+Your feedback, mentorship, and encouragement were essential in helping us refine our ideas and successfully integrate each component of our system.
+
+Finally, a big thank you to everyone behind the scenes who contributed resources, infrastructure, and continuous support throughout the development of this project.
