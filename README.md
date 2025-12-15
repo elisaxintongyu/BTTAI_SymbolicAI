@@ -101,9 +101,11 @@ npm run dev
 
 ## 🏗️ **Project Overview**
 
+### **Neural Symbolic Monkeys**
+
 This project was created as part of the Break Through Tech AI Program, which provides students with industry experience in building real-world AI systems. Through the program's AI Studio, our team partnered with MIT Lincoln Laboratory to explore neural-symbolic AI: the combination of neural network perception with symbolic reasoning.
 
-Our project focused on building an end-to-end neural-symbolic reasoning system that can interpret an image of a scene, understand a natural-language question about it, and generate an interpretable sequence of actions to achieve a goal. To accomplish this, we developed:
+Our project is a spin on an old symbolic planning problem of finding the sequence of steps a monkey must take to obtain bananas in a room. We focused on building an end-to-end neural-symbolic reasoning system that can interpret an image of a scene, understand a natural-language question about it, and generate an interpretable sequence of actions to achieve a goal. To accomplish this, we developed:
 
 - A computer vision module using YOLOv8 to detect objects and convert them into symbolic propositions
 - An LLM component that translates user questions into formal logic goals and explains planner output
@@ -113,6 +115,16 @@ Our project focused on building an end-to-end neural-symbolic reasoning system t
 This work addresses a broader real-world challenge: creating AI systems that are both capable and explainable. Neural-symbolic systems offer a path toward AI that can perceive complex environments, reason over them, and clearly communicate its decision process. The potential applications span robotics, autonomous agents, decision support, and any domain where transparent, verifiable reasoning is essential.
 
 Our project demonstrates a practical example of how perception, language understanding, and symbolic planning can work together, moving toward more trustworthy, interpretable, and adaptable AI systems.
+
+### **What is Neural Symbolic AI?**
+
+Neuro-symbolic AI is a field of artificial intelligence that integrates neural deep learning and symbolic AI. 
+
+**Neural networks** learn from data from statistical methods, and uses probabilitistic deduction and inference. It excels at pattern recognition but struggles with generalization outside of training data. 
+
+**Symbolic reasoning** represents abstracts concepts (logical propositions) and utilizes symbols, rules, and logic. It has limitations with unstructured data but is good for a deterministic answer.
+
+Our project explores a hybrid approach that combines **neural networks** with **symbolic AI** to recognize patterns in data while explicitly modeling relationships and rules between objects. The goal is to create explainable AI systems for complex tasks while using fewer examples and less data. In this project, a convolutional neural network (CNN) is responsible for detecting and classifying objects, while the symbolic reasoning component interprets relational concepts such as “right of” or “on top of”.
 
 ---
 
