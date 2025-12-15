@@ -11,6 +11,8 @@
 | Elisa Yu            | @elisaxintongyu|Built the frontend and integrated backend modules to enable transparent, end-to-end neural-symbolic reasoning from visual input to interpretable action plans.        |
 | Bhargavi Patil      | @bhar024      | Deployed LLM using GPT4ALL for conversion of natural language into FOL                 |
 | Jose Gael Cruz Lopez | [Jose Gael Cruz Lopez](https://github.com/Jose-Gael-Cruz-Lopez) | Built an LLM agent for natural language to symbolic logic translation using GPT4All and OpenAI. Integrated goal translation, FOL generation, and plan explanation. |
+| Maggie Yung | @maggieyung | Computer Vision object detection, array grid representation, UI design |
+
 
 ---
 
