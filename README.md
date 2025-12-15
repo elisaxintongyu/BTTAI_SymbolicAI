@@ -59,6 +59,8 @@ Key dependencies include:
 - `torch` and `torchvision` (deep learning frameworks)
 - `opencv-python` (image processing)
 - `onnxruntime` (model inference)
+- `pyqt5` (graphical user inference)
+- `numpy` (numerical operations)
 
 ### **3. Set Up Environment Variables**
 
@@ -134,7 +136,7 @@ Our project explores a hybrid approach that combines **neural networks** with **
 
 Our project used two custom-curated datasets designed to support both perception and symbolic reasoning components of the system:
 
-1. **Realistic Image Dataset**: Contained images representing monkeys, bananas, and boxes in a room-like environment. These images were manually annotated using Roboflow, producing YOLO-format bounding boxes.
+1. **Realistic Image Dataset**: Contained images representing monkeys, bananas, and boxes in a room-like environment. These images were manually annotated using LabelImg, producing YOLO-format bounding boxes.
 2. **Abstract Grid Dataset**: A semantically equivalent dataset where objects were represented as colored cells on a grid. This allowed controlled experiments on scene understanding without visual noise or variation.
 
 Both datasets supported multi-class object detection, enabling us to identify the monkey, banana, and multiple box types required for downstream symbolic reasoning.
