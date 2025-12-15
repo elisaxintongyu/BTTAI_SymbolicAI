@@ -157,6 +157,10 @@ Both datasets supported multi-class object detection, enabling us to identify th
 
 - Small dataset size: required careful annotation and data augmentation to avoid overfitting.
 
+<img height="230" alt="image" src="https://github.com/user-attachments/assets/0094c184-6207-41b6-932c-2f5f63604e6e" />
+<img height="230" alt="image" src="https://github.com/user-attachments/assets/d9f8bb5e-16ba-4184-96fa-2d71bacb6242" />
+
+
 ---
 
 ## 🧠 **Model Development**
