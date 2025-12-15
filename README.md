@@ -8,7 +8,7 @@
 | ------------------- | ------------- | -------------------------------------------------------------------------------------- |
 | Era Kalaja          | @csera5       | Computer Vision object detection, Data Exploration, Integration                        |
 | Michelle Zuckerberg | @mlzuckerberg | STRIPS planner component development, integration documentation, and team coordination |
-|                     |               |                                                                                        |
+| Elisa Yu            | @elisaxintongyu|Built the frontend and integrated backend modules to enable transparent, end-to-end neural-symbolic reasoning from visual input to interpretable action plans.        |
 |                     |               |                                                                                        |
 |                     |               |                                                                                        |
 |                     |               |                                                                                        |
@@ -41,10 +41,13 @@ cd BTTAI_SymbolicAI
 
 ### **2. Install Dependencies**
 
-Install all required Python packages:
+Install all required Python packages and setting up Backend Environment:
 
 ```bash
+python -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
+uvicorn main:app --reload
 ```
 
 Key dependencies include:
@@ -86,31 +89,12 @@ Each split contains both `images/` and `labels/` directories with YOLO-format an
 
 **Basic Usage:**
 
-Run the complete neural-symbolic pipeline:
+Run the frontend for Neural Symbolic Monkeys:
 
 ```bash
-python main.py -i <image_path> -q "<question>"
+npm install
+npm run dev 
 ```
-
-**Examples:**
-
-```bash
-# Process a realistic image
-python main.py -i data/monkey_dataset/test/images/canvas_0_banana3_monkey1_box3_png.rf.b415fe8a11da2ac54f21f1907ed2fb59.jpg -q "How can the monkey get the banana?"
-
-# Use grid mode (no model required)
-python main.py -i planner/example_image.png -q "Get the banana" --mode grid
-
-# Enable verbose logging
-python main.py -i <image_path> -q "<question>" --verbose
-```
-
-**Command-line Arguments:**
-
-- `-i, --image`: Path to input image (required)
-- `-q, --question`: Natural language question about the planning problem (required)
-- `-m, --mode`: Image processing mode - `realistic` or `grid` (default: `realistic`)
-- `-v, --verbose`: Enable verbose logging
 
 ---
 
@@ -269,6 +253,63 @@ plan = planner.plan(
 ## 🤖 **LLM Component**
 
 _This section is to be filled in by the LLM team._
+
+---
+
+## 🌐 Web Development & System Integration
+
+The web development component of this project provides an interactive interface that connects the full neural-symbolic pipeline—bridging perception, reasoning, and planning into a cohesive user experience. The goal of the web layer was not only to enable usability, but also to surface **intermediate symbolic representations** to support interpretability and debugging.
+
+### Frontend Overview
+
+The frontend was implemented as a lightweight, modular web interface that allows users to:
+- Upload an image of a scene (realistic or abstract)
+- Enter a natural-language question or goal
+- View structured outputs produced at each stage of the pipeline
+
+The interface was designed to emphasize **transparency**, enabling users to inspect how raw visual inputs and natural-language queries are transformed into symbolic logic and executable plans.
+
+**Key responsibilities of the frontend include:**
+- Collecting user inputs (image + question)
+- Triggering backend inference and planning workflows
+- Rendering results in a structured, human-readable format
+
+Displayed outputs include:
+- Detected objects and their inferred spatial relationships
+- Generated symbolic facts (predicates) derived from vision
+- Planner-generated action sequences
+- Natural-language explanations of the plan
+
+This design ensures that users can trace the system’s reasoning process end to end, rather than treating it as a black box.
+
+### Backend Integration Layer
+
+The backend integration layer acts as the orchestration point for all system components. It exposes a unified interface that the frontend interacts with, while internally coordinating:
+
+1. **Computer Vision Inference**  
+   - Receives the uploaded image
+   - Runs YOLO-based object detection
+   - Converts detections into symbolic state representations
+
+2. **LLM-Based Reasoning**  
+   - Translates natural-language questions into formal goal specifications
+   - Generates natural-language explanations from planner outputs
+
+3. **Symbolic Planning**  
+   - Constructs PDDL problem files from symbolic state and goals
+   - Executes the STRIPS planner
+   - Returns ordered action sequences or failure states
+
+The integration layer ensures consistent data formats and clean handoffs between modules, allowing each component to be developed and tested independently while still functioning as part of a unified system.
+
+### Design Philosophy
+
+The web development effort prioritized:
+- **Modularity**: Each component (vision, LLM, planner) communicates through clearly defined interfaces.
+- **Interpretability**: Intermediate outputs are preserved and displayed rather than hidden.
+- **Extensibility**: The architecture supports future additions such as interactive plan editing, alternative planners, or robotic execution backends.
+
+By tightly integrating the frontend with the backend pipeline, the web component transforms the project from a collection of standalone models into a usable, explainable neural-symbolic AI system.
 
 ---
 
