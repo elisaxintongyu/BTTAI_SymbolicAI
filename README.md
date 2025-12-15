@@ -159,6 +159,10 @@ Both datasets supported multi-class object detection, enabling us to identify th
 
 - The Computer Vision model had a train/validation/test split of 70/20/10. It was evaluated on box_loss, precision, and recall.
 
+### **Grid Representation**
+
+- Objects are mapped as structured cells on a 2D grid, using both a graphical interface and backend logic to translate input images into symbolic representations. Each cell value corresponds to a specific class (banana, monkey, boxA, etc.), supporting tasks like object localization, and allowing symbolic reasoning for integration with the STRIPS planner. Images are divided into a 32x32 grid, with the center or overlapping cells marked based on detected object bounding boxes (x, y, width, height). The GUI (built with PyQt5) visualizes grid cell assignments by coloring the corresponding grid cell coordinates in the image overlay.
+
 ---
 
 ## 🧩 **STRIPS Planner Component**
