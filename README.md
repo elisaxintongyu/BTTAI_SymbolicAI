@@ -258,14 +258,12 @@ plan = planner.plan(
 The **LLM (Large Language Model) component** serves as the intelligent interface between the user’s natural language input and the symbolic planning system. Its role is twofold:
 
 1. **Translation to Formal Logic**  
-   It converts ambiguous user queries — such as "Can the monkey get the banana?" or "How can the monkey grab the fruit?" — into formal PDDL-style goal specifications (e.g., `HasBanana = True`) that the symbolic planner can understand and operate on.
+   It converts ambiguous user queries — such as "Can the monkey get the banana?" or "How can the monkey grab the fruit?", into formal PDDL-style goal specifications (e.g., `HasBanana = True`) that the symbolic planner can understand and operate on.
 
 2. **Plan Explanation**  
    After the planner produces a symbolic sequence of actions, the LLM component turns this output into a clear, step-by-step explanation in plain English, enhancing system interpretability and usability for non-experts.
 
 This dual translation capability allows the system to handle the **flexibility of natural language** while preserving the **precision of symbolic reasoning** — essential for neural-symbolic integration.
-
----
 
 ### Implementation Details
 
@@ -297,7 +295,6 @@ The LLM Agent is designed with **two interchangeable backends** to balance flexi
   - Output quality may vary depending on model size.
 - **Recommended for:** Local development, offline inference, and API-free deployment environments.
 
----
 
 ### Core Responsibilities of the LLM Component
 
@@ -308,8 +305,6 @@ The LLM Agent is designed with **two interchangeable backends** to balance flexi
 | `plan_to_explanation(plan, qn)`  | Converts symbolic action steps into a natural-language explanation          |
 
 All functions operate on top of the active backend (OpenAI API or GPT4All), and use structured prompting to ensure consistent format and responses.
-
----
 
 ### Pipeline Integration
 
