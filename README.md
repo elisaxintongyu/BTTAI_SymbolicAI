@@ -251,23 +251,88 @@ plan = planner.plan(
 ---
 
 ## 🤖 **LLM Component**
+LLM Component – Natural Language ↔ Formal Planning
 
-The LLM component translates natural language queries into formal PDDL goal specifications and converts planner output back into natural language explanations. This addresses the ambiguity of natural language (e.g "get the banana" vs "grab the banana") while maintaining the accuracy required for symbolic planning.
+The LLM (Large Language Model) component serves as the intelligent interface between the user’s natural language input and the symbolic planning system. Its role is twofold:
 
-### **Implementation**
+Translation to Formal Logic:
+It converts ambiguous user queries — such as “Can the monkey get the banana?” or “How can the monkey grab the fruit?” — into formal PDDL-style goal specifications (e.g., HasBanana = True) that the symbolic planner can understand and operate on.
 
-Two interchangeable backends are supported:
+Plan Explanation:
+After the planner produces a symbolic sequence of actions, the LLM component turns this output into a clear, step-by-step explanation in plain English, enhancing system interpretability and usability for non-experts.
 
-**OpenAI API**
-- Cloud-based inference
-- High-quality output
-- Requires API key
+This dual translation capability allows the system to handle the flexibility of natural language while preserving the precision of symbolic reasoning — essential for neural-symbolic integration.
 
-**GPT4All Local**
-- Primary model: Mistral-7B-Instruct (Q4_0, 4GB)
-- Fallback model: Orca-Mini-3B (Q4_0, 2GB)
-- no API key required
-- Slower inference
+🔧 Implementation Details
+
+The LLM Agent is designed with two interchangeable backends to balance flexibility, performance, and accessibility:
+
+1. OpenAI API (Cloud-based)
+
+Uses gpt-4 or gpt-3.5-turbo via the official OpenAI API.
+
+Advantages:
+
+Fast inference.
+
+High-quality and consistent completions.
+
+Access to powerful instruction-tuned models.
+
+Requirements:
+
+Internet connection.
+
+OpenAI API key.
+
+Recommended for: Development, demos, and high-confidence natural language understanding.
+
+2. GPT4All Local Backend (Offline-capable)
+
+Runs fully on local hardware using the GPT4All Python SDK
+.
+
+Supported Models:
+
+✅ Primary: Mistral-7B-Instruct (Q4_0) (~4 GB RAM required).
+
+✅ Fallback: Orca-Mini-3B (Q4_0) (~2 GB RAM; slower but lighter).
+
+Advantages:
+
+No API key required.
+
+Completely private and offline.
+
+Trade-offs:
+
+Slower inference.
+
+Output quality may vary depending on model size.
+
+Recommended for: Local development, offline inference, and API-free deployment environments.
+
+🧠 Core Responsibilities of the LLM Component
+Function	Description
+question_to_goal(question)	Converts a user’s question into a symbolic goal (e.g. HasBanana = True).
+build_initial_state(vision)	Converts vision model output into symbolic facts (e.g. MonkeyAt(A)).
+plan_to_explanation(plan, qn)	Converts symbolic action steps into a natural-language explanation.
+
+All functions operate on top of the active backend (OpenAI API or GPT4All), and use structured prompting to ensure consistent format and responses.
+
+🔌 Pipeline Integration
+
+Vision model detects the monkey, banana, and boxes and outputs positional data.
+
+LLM Agent:
+
+Translates the user question → formal goal predicate.
+
+Encodes vision output → symbolic world state.
+
+Planner receives state and goal, computes symbolic action sequence.
+
+LLM Agent translates that plan into an answer understandable by the user.
 
 ---
 
