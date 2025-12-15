@@ -9,7 +9,7 @@
 | Era Kalaja          | @csera5       | Computer Vision object detection, Data Exploration, Integration                        |
 | Michelle Zuckerberg | @mlzuckerberg | STRIPS planner component development, integration documentation, and team coordination |
 | Elisa Yu            | @elisaxintongyu|Built the frontend and integrated backend modules to enable transparent, end-to-end neural-symbolic reasoning from visual input to interpretable action plans.        |
-|                     |               |                                                                                        |
+| Bhargavi Patil      | @bhar024      | Deployed LLM using GPT4ALL for conversion of natural language into FOL                 |
 |                     |               |                                                                                        |
 |                     |               |                                                                                        |
 
@@ -252,7 +252,22 @@ plan = planner.plan(
 
 ## 🤖 **LLM Component**
 
-_This section is to be filled in by the LLM team._
+The LLM component translates natural language queries into formal PDDL goal specifications and converts planner output back into natural language explanations. This addresses the ambiguity of natural language (e.g "get the banana" vs "grab the banana") while maintaining the accuracy required for symbolic planning.
+
+### **Implementation**
+
+Two interchangeable backends are supported:
+
+**OpenAI API**
+- Cloud-based inference
+- High-quality output
+- Requires API key
+
+**GPT4All Local**
+- Primary model: Mistral-7B-Instruct (Q4_0, 4GB)
+- Fallback model: Orca-Mini-3B (Q4_0, 2GB)
+- no API key required
+- Slower inference
 
 ---
 
