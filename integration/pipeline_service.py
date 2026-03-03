@@ -53,10 +53,7 @@ class PipelineService:
         plan = self.planner_service.plan(fol)
 
         # 4) Explain plan
-        try:
-            answer = self.llm_client.explain_plan(plan)
-        except Exception:
-            answer = " -> ".join(plan)
+        answer = self.llm_client.explain_plan(plan)
 
         # 5) Bundle all into response model
         return PipelineResponse(

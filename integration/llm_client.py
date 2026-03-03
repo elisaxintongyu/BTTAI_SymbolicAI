@@ -111,4 +111,46 @@ class LLMClient:
         )
 
         plan_str = "\n".join(plan)
-        return self._invoke(prompt_template=prompt, plan_str=plan_str)
+        try:
+            return self._invoke(prompt_template=prompt, plan_str=plan_str)
+        except Exception:
+            return self._fallback_plan_explanation(plan)
+
+    def _fallback_plan_explanation(self, plan: List[str]) -> str:
+        if not plan:
+            return "No valid plan was found."
+
+        steps: List[str] = []
+        for action in plan:
+            normalized = action.strip().strip("()")
+            if not normalized:
+                continue
+
+            parts = normalized.split()
+            name = parts[0]
+            args = parts[1:]
+
+            if name == "move" and len(args) >= 3:
+                steps.append(f"move {args[0]} from {args[1]} to {args[2]}")
+            elif name == "climb_on" and len(args) >= 3:
+                steps.append(f"climb {args[0]} onto {args[1]} at {args[2]}")
+            elif name == "climb_off" and len(args) >= 3:
+                steps.append(f"climb {args[0]} off {args[1]} at {args[2]}")
+            elif name == "push_box" and len(args) >= 4:
+                steps.append(f"push {args[1]} from {args[2]} to {args[3]}")
+            elif name == "grab_banana_from_ground" and len(args) >= 3:
+                steps.append(f"grab {args[1]} from the ground at {args[2]}")
+            elif name == "grab_banana_from_box" and len(args) >= 4:
+                steps.append(f"grab {args[1]} from {args[2]} at {args[3]}")
+            elif name == "noop":
+                steps.append("no action can be taken from the current state")
+            else:
+                human = name.replace("_", " ")
+                if args:
+                    steps.append(f"{human} ({', '.join(args)})")
+                else:
+                    steps.append(human)
+
+        if not steps:
+            return "No valid plan was found."
+        return "The monkey should " + ", then ".join(steps) + "."

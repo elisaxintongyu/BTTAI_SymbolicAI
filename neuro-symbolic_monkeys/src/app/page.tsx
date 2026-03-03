@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ChangeEvent } from "react";
+import { useState, ChangeEvent, Dispatch, SetStateAction } from "react";
 import bgImage from "./Screenshot 2025-12-07 at 10.01.10 PM.png";
 import detectedImg from "./vis_yolo.jpg";
 
@@ -27,12 +27,56 @@ interface ChatSectionProps {
   sceneImage: string | null;
   setSceneImage: (url: string | null) => void;
   messages: Message[];
-  setMessages: (messages: Message[]) => void;
+  setMessages: Dispatch<SetStateAction<Message[]>>;
   setResult: (result: AskResponseBody | null) => void;
 }
 
 interface ModelPanelProps {
   result: AskResponseBody | null;
+}
+
+function planToNaturalLanguage(plan: string[]): string {
+  if (!plan.length) {
+    return "No valid plan was found.";
+  }
+
+  const steps = plan.map((raw) => {
+    const normalized = raw.trim().replace(/^\(|\)$/g, "");
+    const [name, ...args] = normalized.split(/\s+/);
+    if (!name) return "";
+
+    if (name === "move" && args.length >= 3) {
+      return `move ${args[0]} from ${args[1]} to ${args[2]}`;
+    }
+    if (name === "climb_on" && args.length >= 3) {
+      return `climb ${args[0]} onto ${args[1]} at ${args[2]}`;
+    }
+    if (name === "climb_off" && args.length >= 3) {
+      return `climb ${args[0]} off ${args[1]} at ${args[2]}`;
+    }
+    if (name === "push_box" && args.length >= 4) {
+      return `push ${args[1]} from ${args[2]} to ${args[3]}`;
+    }
+    if (name === "grab_banana_from_ground" && args.length >= 3) {
+      return `grab ${args[1]} from the ground at ${args[2]}`;
+    }
+    if (name === "grab_banana_from_box" && args.length >= 4) {
+      return `grab ${args[1]} from ${args[2]} at ${args[3]}`;
+    }
+    return normalized.replace(/_/g, " ");
+  }).filter(Boolean);
+
+  return steps.length
+    ? `The monkey should ${steps.join(", then ")}.`
+    : "No valid plan was found.";
+}
+
+function resolveAssistantText(data: AskResponseBody): string {
+  const answer = (data.answer ?? "").trim();
+  if (answer.length > 0 && !/^\(?[a-z_]+\s+[\w-]+/i.test(answer)) {
+    return answer;
+  }
+  return planToNaturalLanguage(data.plan ?? []);
 }
 
 export default function Page(): JSX.Element {
@@ -89,6 +133,13 @@ function ChatSection({
       }
       const data = (await res.json()) as AskResponseBody;
       setResult(data);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          text: resolveAssistantText(data),
+        },
+      ]);
     } catch {
       // Ignore preview failures; user can still ask manually.
     }
@@ -163,7 +214,7 @@ function ChatSection({
       setResult(data);
       setMessages([
         ...nextMessages,
-        { role: "assistant", text: data.answer || "No answer generated." },
+        { role: "assistant", text: resolveAssistantText(data) },
       ]);
     } catch {
       setMessages([
@@ -283,7 +334,7 @@ function ModelPanel({ result }: ModelPanelProps): JSX.Element {
       <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <h2 className="text-sm font-semibold text-gray-700 mb-2">Detected Objects</h2>
-          <div className="bg-gray-100 rounded-md px-4 py-3 text-sm font-mono text-gray-800 space-y-1">
+          <div className="bg-gray-100 rounded-md px-4 py-3 text-sm font-mono text-gray-800 space-y-1 max-h-52 overflow-y-auto">
             {(result?.objects ?? []).length === 0 ? (
               <div>No detections yet.</div>
             ) : (
