@@ -48,12 +48,6 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Models (large files)
-models/
-*.onnx
-*.weights
-*.pb
-
 # Processed images
 processed_images/
 detections.json

@@ -1,0 +1,14 @@
+path: data/monkey_dataset
+train: train/images
+val: valid/images
+test: test/images
+
+
+names:
+  0: banana 
+  1: boxA
+  2: boxB
+  3: boxC
+  4: boxD
+  5: boxE
+  6: monkey

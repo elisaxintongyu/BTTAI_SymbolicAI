@@ -1,0 +1,4 @@
+(move monkey l1 l2)
+(move monkey l2 l3)
+(move monkey l3 l4)
+(grab_banana_from_ground monkey banana l4)
