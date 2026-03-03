@@ -40,6 +40,8 @@ class PipelineService:
     def run(self, req: AskRequest) -> PipelineResponse:
         # 1) Detect objects
         objects = self.detection_service.detect_objects(req.image_url)
+        detection_image_url = getattr(self.detection_service, "last_detection_image_url", None)
+        grid_image_url = getattr(self.detection_service, "last_grid_image_url", None)
 
         # 2) Build FOL from question + objects
         try:
@@ -62,6 +64,8 @@ class PipelineService:
             fol=fol,
             plan=plan,
             answer=answer,
+            detection_image_url=detection_image_url,
+            grid_image_url=grid_image_url,
         )
 
     def _fallback_fol(self, objects) -> List[str]:

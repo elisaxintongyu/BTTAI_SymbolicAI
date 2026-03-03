@@ -14,6 +14,8 @@ interface AskResponseBody {
   fol: string[];
   plan: string[];
   answer: string;
+  detection_image_url?: string;
+  grid_image_url?: string;
 }
 
 interface Message {
@@ -72,6 +74,26 @@ function ChatSection({
   const [text, setText] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const runDetectionPreview = async (imageUrl: string): Promise<void> => {
+    try {
+      const res = await fetch("/api/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageUrl,
+          question: "Detect objects in the uploaded image.",
+        }),
+      });
+      if (!res.ok) {
+        return;
+      }
+      const data = (await res.json()) as AskResponseBody;
+      setResult(data);
+    } catch {
+      // Ignore preview failures; user can still ask manually.
+    }
+  };
+
   const uploadImage = async (file: File): Promise<void> => {
     const formData = new FormData();
     formData.append("image", file);
@@ -86,6 +108,7 @@ function ChatSection({
     if (res.ok && data.fileUrl) {
       setSceneImage(data.fileUrl);
       setResult(null);
+      await runDetectionPreview(data.fileUrl);
     } else {
       alert("Upload failed: " + (data.error ?? "Unknown error"));
     }
@@ -248,12 +271,12 @@ function ModelPanel({ result }: ModelPanelProps): JSX.Element {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <div>
           <h2 className="text-sm font-semibold text-gray-600 mb-2">Detection with bounded boxes</h2>
-          <img src={detectedImg.src} alt="Detected Scene" />
+          <img src={result?.detection_image_url ?? detectedImg.src} alt="Detected Scene" />
         </div>
 
         <div>
           <h2 className="text-sm font-semibold text-gray-600 mb-2">Detection with array representation</h2>
-          <img src={bgImage.src} alt="Object Detection Grid" />
+          <img src={result?.grid_image_url ?? bgImage.src} alt="Object Detection Grid" />
         </div>
       </div>
 

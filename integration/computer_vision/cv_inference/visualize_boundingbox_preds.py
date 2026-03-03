@@ -2,13 +2,12 @@ from pathlib import Path
 from typing import List
 import logging
 
-import cv2
-from ultralytics import YOLO
-
 try:
     from models import DetectedObject
 except ImportError:  # pragma: no cover - supports package/module run modes
     from integration.models import DetectedObject
+
+from archive.grid_detection import run_grid_detection
 
 
 logger = logging.getLogger(__name__)
@@ -22,14 +21,16 @@ class ImageDetector:
 
     def __init__(self, model_path: str | None = None, output_path: str | None = None):
         repo_root = Path(__file__).resolve().parents[3]
-        self.model_path = Path(model_path) if model_path else repo_root / "integration" / "computer_vision" / "vision" / "models" / "best.pt"
+        self.model_path = Path(model_path) if model_path else repo_root / "integration" / "computer_vision" / "vision" / "models" / "best.onnx"
         self.output_path = Path(output_path) if output_path else repo_root / "integration" / ".runtime" / "vis_yolo.jpg"
         self.repo_root = repo_root
         self.frontend_public_dir = repo_root / "neuro-symbolic_monkeys" / "public"
+        self.generated_public_dir = self.frontend_public_dir / "generated"
+        self.last_detection_image_url: str | None = None
+        self.last_grid_image_url: str | None = None
 
         if not self.model_path.exists():
             raise FileNotFoundError(f"YOLO model not found: {self.model_path}")
-        self.model = YOLO(str(self.model_path))
 
     def _resolve_image_path(self, image_url: str) -> Path:
         candidate = Path(image_url)
@@ -46,18 +47,28 @@ class ImageDetector:
 
     def detect_objects(self, image_url: str) -> List[DetectedObject]:
         image_path = self._resolve_image_path(image_url)
-        result = self.model(str(image_path), imgsz=1024)[0]
+        self.generated_public_dir.mkdir(parents=True, exist_ok=True)
+        stem = image_path.stem
+        bbox_file = self.generated_public_dir / f"{stem}_bbox.jpg"
+        grid_file = self.generated_public_dir / f"{stem}_grid.jpg"
+        detections = run_grid_detection(
+            image_path=image_path,
+            bbox_out_path=bbox_file,
+            grid_out_path=grid_file,
+            model_path=self.model_path,
+        )
+        self.last_detection_image_url = f"/generated/{bbox_file.name}"
+        self.last_grid_image_url = f"/generated/{grid_file.name}"
 
-        annotated = result.plot()
-        self.output_path.parent.mkdir(parents=True, exist_ok=True)
-        cv2.imwrite(str(self.output_path), annotated)
-
-        names = result.names if isinstance(result.names, dict) else {}
         objects: List[DetectedObject] = []
-        for box in result.boxes:
-            cls_id = int(box.cls.item())
-            x_center, y_center, w, h = box.xywh[0].tolist()
-            label = str(names.get(cls_id, f"class_{cls_id}"))
+        for det in detections:
+            x = float(det["x"])
+            y = float(det["y"])
+            w = float(det["w"])
+            h = float(det["h"])
+            label = str(det["label"])
+            x_center = x + (w / 2)
+            y_center = y + (h / 2)
             objects.append(
                 DetectedObject(
                     label=label,

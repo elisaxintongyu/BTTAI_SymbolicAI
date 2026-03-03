@@ -19,6 +19,8 @@ export interface AskResponseBody {
   fol: string[];
   plan: string[];
   answer: string;
+  detection_image_url?: string;
+  grid_image_url?: string;
 }
 
 export async function POST(req: NextRequest): Promise<NextResponse> {

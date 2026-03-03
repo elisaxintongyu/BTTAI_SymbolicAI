@@ -18,3 +18,5 @@ class PipelineResponse(BaseModel):
     fol: List[str]
     plan: List[str]
     answer: str
+    detection_image_url: str | None = None
+    grid_image_url: str | None = None
